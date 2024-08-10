@@ -9,13 +9,13 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 import pickle
 from keras.models import load_model
-
+import google.generativeai as genai
 
 def download_data():
-    path = "path to service account key" # Replace with the path to your service account key (json file)
-    cred = credentials.Certificate(path)  
+    path = "C:/Users/mano/Downloads/esp8266-hr-spo2-firebase-adminsdk-ko2r2-60e0be8017.json"
+    cred = credentials.Certificate(path)  # Replace with the path to your service account key
     firebase_admin.initialize_app(cred, {
-        'databaseURL': 'your database url'  # Replace with your database URL
+        'databaseURL': 'https://esp8266-hr-spo2-default-rtdb.asia-southeast1.firebasedatabase.app/'  # Replace with your database URL
     })
 
     # Reference to the specific path in Firebase
@@ -112,6 +112,17 @@ def load_model_and_scaler(model_path, scaler_path, threshold_path):
     return autoencoder, scaler, threshold
 
 
+def generate_insights(spo2, heartrate):
+    GOOGLE_API_KEY = "your_google_api_key"
+    genai.configure(api_key=GOOGLE_API_KEY)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    req = "this is my spo2 level "+ str(spo2)+" and this is my heart rate " +str(heartrate) +" give me some insights like what food to eat , what to make it as normal if this is abnormal ? give responce in 30 to 50 words only "
+    print(req)
+    response = model.generate_content(str(req))
+    #print(response.text)
+    return response.text
+
+
 download_data()
 
 df = clean_data_set()
@@ -122,10 +133,10 @@ df = clean_data_set()
 #load the modle
 autoencoder, scaler, threshold = load_model_and_scaler("autoencoder_model.h5", "scaler.pkl", "threshold.pkl")
 
-# New data for prediction (must be a DataFrame with the same features)
+# Test New data for prediction (must be a DataFrame with the same features)
 new_data = pd.DataFrame({
-    'HeartRate': [72, 65, 110,150],
-    'SpO2': [97, 85, 92,80],
+    'HeartRate': [722, 65, 110,150],
+    'SpO2': [917, 85, 92,80],
     'ValidHeartRate': [1, 1, 1,1],
     'ValidSpO2': [1, 1, 1,1]
 })
@@ -138,5 +149,5 @@ new_data['reconstruction_error'] = reconstruction_error
 new_data['is_anomaly'] = is_anomaly
 
 print(new_data)
-
+print(generate_insights(new_data['SpO2'][0], new_data['HeartRate'][0]))
 

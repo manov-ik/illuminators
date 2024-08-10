@@ -11,7 +11,22 @@ import pickle
 from keras.models import load_model
 
 
+def download_data():
+    path = "C:/Users/mano/Downloads/esp8266-hr-spo2-firebase-adminsdk-ko2r2-60e0be8017.json"
+    cred = credentials.Certificate(path)  # Replace with the path to your service account key
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': 'https://esp8266-hr-spo2-default-rtdb.asia-southeast1.firebasedatabase.app/'  # Replace with your database URL
+    })
 
+    # Reference to the specific path in Firebase
+    ref = db.reference('HealthData')
+
+    # Fetch all data 
+    data = ref.get()
+
+    # Convert the data to a DataFrame
+    df = pd.DataFrame(data).T
+    df.to_excel("excel.xlsx")
 
 def clean_data_set():
     df = pd.read_excel("excel.xlsx")
@@ -96,10 +111,15 @@ def load_model_and_scaler(model_path, scaler_path, threshold_path):
     
     return autoencoder, scaler, threshold
 
+
+download_data()
+
 df = clean_data_set()
 
 #train 
 #train_autoencoder(df)
+
+#load the modle
 autoencoder, scaler, threshold = load_model_and_scaler("autoencoder_model.h5", "scaler.pkl", "threshold.pkl")
 
 # New data for prediction (must be a DataFrame with the same features)

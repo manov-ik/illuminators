@@ -3,6 +3,7 @@ import { db } from "../firebase";
 import { collection, addDoc, doc, setDoc } from "firebase/firestore";
 import Navbar from "./Navbar";
 
+
 const UserForm = () => {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -19,7 +20,6 @@ const UserForm = () => {
         weight: weight,
       });
 
-      // Create health data for the new user. Fetch from esp/flask server.
       const defaultHealthData = {
         heartRate: 120,
         SPO2: 80,
@@ -43,40 +43,58 @@ const UserForm = () => {
   };
 
   return (
-   <div className='wrapper md:px-20 lg:px-40'>
-    <Navbar/>
-     <form onSubmit={handleSubmit} className="p-4">
-      <input
-        type="text"
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
-      <input
-        type="number"
-        placeholder="Age"
-        value={age}
-        onChange={(e) => setAge(e.target.value)}
-        required
-      />
-      <input
-        type="number"
-        placeholder="Height (cm)"
-        value={height}
-        onChange={(e) => setHeight(e.target.value)}
-        required
-      />
-      <input
-        type="number"
-        placeholder="Weight (kg)"
-        value={weight}
-        onChange={(e) => setWeight(e.target.value)}
-        required
-      />
-      <button type="submit">Register User</button>
-    </form>
-   </div>
+    <div className='wrapper md:px-20 lg:px-40'>
+      <Navbar/>
+      <div >
+        <form 
+          onSubmit={handleSubmit}
+          className='shadow-2xl border border-gray-400 bg-gray-100 rounded-lg p-9 m-5 md:w-4/12 md:my-36 sm:my-28 sm:mx-auto md:p-12'>
+          <h1 className="font-semibold text-2xl m-4">Register User</h1>
+
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className='p-3 m-4 border border-gray-400 w-full rounded-lg'
+            required
+          />
+
+          <input
+            type="number"
+            placeholder="Age"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            className='p-3 m-4 border border-gray-400 w-full rounded-lg'
+            required
+          />
+
+          <input
+            type="number"
+            placeholder="Height (cm)"
+            value={height}
+            onChange={(e) => setHeight(e.target.value)}
+            className='p-3 m-4 border border-gray-400 w-full rounded-lg'
+            required
+          />
+
+          <input
+            type="number"
+            placeholder="Weight (kg)"
+            value={weight}
+            onChange={(e) => setWeight(e.target.value)}
+            className='p-3 m-4 border border-gray-400 w-full rounded-lg'
+            required
+          />
+
+          <button 
+            type="submit"
+            className='w-full bg-red-500 p-3 m-4 rounded-lg text-white font-semibold'>
+            Register User
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 

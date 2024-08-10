@@ -36,7 +36,7 @@ const Navbar = () => {
   return (
     <React.Fragment>
       <section>
-        <div className="w-full h-20 flex justify-between items-center text-white text-xl px-8 md:px-16 shadow-md">
+        <div className=" wrapped w-full h-20 flex justify-between items-center text-white text-xl px-8 md:px-16 shadow-md">
           {/* Logo section */}
           <div className="flex items-center">
             <p className="text-3xl font-bold">
@@ -64,7 +64,7 @@ const Navbar = () => {
                 className="text-white px-4 py-2 ml-4 border-b-2 border-transparent hover:border-red-500 transition"
                 onClick={handleSignout}
               >
-                Sign Out
+                Sign Out 
               </button>
             ) : (
               <NavLink

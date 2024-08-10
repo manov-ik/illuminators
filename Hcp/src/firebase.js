@@ -2,12 +2,12 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID,
+  apiKey:"AIzaSyBvsqDKZkeusySWw91SzmSRvXHBhnJR35Y",
+  authDomain: "esp8266-hr-spo2.firebaseapp.com",
+  projectId: "esp8266-hr-spo2",
+  storageBucket: "esp8266-hr-spo2.appspot.com",
+  messagingSenderId: "179176541793",
+  appId: "1:179176541793:web:eca5ee9b22afe459bd2420",
 };
 
 const app = initializeApp(firebaseConfig);

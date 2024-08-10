@@ -3,7 +3,6 @@ import { db } from "../firebase";
 import { collection, addDoc, doc, setDoc } from "firebase/firestore";
 import Navbar from "./Navbar";
 
-
 const UserForm = () => {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -13,13 +12,15 @@ const UserForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Add user to the 'users' collection
       const userDocRef = await addDoc(collection(db, "users"), {
         name: name,
-        age: age,
-        height: height,
-        weight: weight,
+        age: Number(age),       // Convert to number if you expect numbers
+        height: Number(height), // Convert to number if you expect numbers
+        weight: Number(weight), // Convert to number if you expect numbers
       });
 
+      // Set default health data
       const defaultHealthData = {
         heartRate: 120,
         SPO2: 80,
@@ -32,6 +33,7 @@ const UserForm = () => {
         defaultHealthData
       );
 
+      // Reset form fields
       setName("");
       setAge("");
       setHeight("");
@@ -43,7 +45,7 @@ const UserForm = () => {
   };
 
   return (
-    <div className='wrapper md:px-20 lg:px-40'>
+    <div className="wrapper">
       <Navbar/>
       <div >
         <form 

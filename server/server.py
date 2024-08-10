@@ -14,16 +14,22 @@ import google.generativeai as genai
 import schedule
 import time
 from datetime import datetime
+from tensorflow.keras.losses import MeanSquaredError
+
 
 app = Flask(__name__)
 
-def download_data():
+def initialize_firebase():
     path = "./credentials.json"  # Replace with the path to your service account key (json file)
     cred = credentials.Certificate(path)
-    firebase_admin.initialize_app(cred, {
-        'databaseURL': 'https://esp8266-hr-spo2-default-rtdb.asia-southeast1.firebasedatabase.app/'  # Replace with your database URL
-    })
+    if not firebase_admin._apps:
+        firebase_admin.initialize_app(cred, {
+            'databaseURL': 'https://esp8266-hr-spo2-default-rtdb.asia-southeast1.firebasedatabase.app/'  # Replace with your database URL
+        })
 
+initialize_firebase()  # Initialize Firebase once
+
+def download_data():
     # Reference to the specific path in Firebase
     ref = db.reference('HealthData')
 
@@ -47,7 +53,7 @@ def clean_data_set():
 
 def save_model(autoencoder, scaler, threshold, model_path, scaler_path, threshold_path):
     # Save the trained autoencoder model
-    autoencoder.save(model_path)
+    autoencoder.save(model_path, save_format='h5')  # Ensure using 'h5' format for compatibility
 
     # Save the scaler
     with open(scaler_path, 'wb') as f:
@@ -78,7 +84,7 @@ def train_autoencoder(df, encoding_dim=2, epochs=50, batch_size=32, test_size=0.
     decoder = Dense(input_dim, activation="sigmoid")(encoder)
 
     autoencoder = Model(inputs=input_layer, outputs=decoder)
-    autoencoder.compile(optimizer="adam", loss="mse")
+    autoencoder.compile(optimizer="adam", loss=MeanSquaredError())  # Use MeanSquaredError() for compatibility
 
     # Train the autoencoder
     autoencoder.fit(X_train, X_train, epochs=epochs, batch_size=batch_size, validation_data=(X_test, X_test), verbose=1)
@@ -91,6 +97,7 @@ def train_autoencoder(df, encoding_dim=2, epochs=50, batch_size=32, test_size=0.
     threshold = np.percentile(train_mse, 95)
 
     save_model(autoencoder, scaler, threshold, "autoencoder_model.h5", "scaler.pkl", "threshold.pkl")
+
 
 
 def predict_anomaly(autoencoder, scaler, threshold, new_data):
@@ -111,7 +118,7 @@ def predict_anomaly(autoencoder, scaler, threshold, new_data):
 
 def load_model_and_scaler(model_path, scaler_path, threshold_path):
     # Load the trained autoencoder model
-    autoencoder = load_model(model_path)
+    autoencoder = load_model(model_path, custom_objects={"MeanSquaredError": MeanSquaredError()})
 
     # Load the scaler
     with open(scaler_path, 'rb') as f:
@@ -122,6 +129,7 @@ def load_model_and_scaler(model_path, scaler_path, threshold_path):
         threshold = pickle.load(f)
 
     return autoencoder, scaler, threshold
+
 
 
 def generate_insights(spo2, heartrate):
@@ -136,21 +144,47 @@ def generate_insights(spo2, heartrate):
 # API route for training the model
 @app.route('/train', methods=['POST'])
 def train():
-    df = clean_data_set()  # Clean the data
-    train_autoencoder(df)  # Train the model
-    return jsonify({"message": "Training completed"})
+    try:
+        df = clean_data_set()  # Clean the data
+        train_autoencoder(df)  # Train the model
+        return jsonify({"message": "Training completed"})
+    except Exception as e:
+        # Log the error and return a 500 response with the error message
+        print(f"Error during training: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 # API route for making predictions
 @app.route('/predict', methods=['POST'])
 def predict():
-    autoencoder, scaler, threshold = load_model_and_scaler("autoencoder_model.h5", "scaler.pkl", "threshold.pkl")
-    new_data = request.json  # Get the input data from the POST request
-    df_new_data = pd.DataFrame(new_data)
-    is_anomaly, reconstruction_error = predict_anomaly(autoencoder, scaler, threshold, df_new_data)
+    try:
+        # Load the trained model and scaler
+        autoencoder, scaler, threshold = load_model_and_scaler("autoencoder_model.h5", "scaler.pkl", "threshold.pkl")
 
-    # Return the results as JSON
-    return jsonify({"reconstruction_error": reconstruction_error.tolist(), "is_anomaly": is_anomaly.tolist()})
+        # Get the input data from the POST request
+        new_data = request.json
+        df_new_data = pd.DataFrame(new_data)
+
+        # Ensure the DataFrame columns match the expected columns
+        expected_columns = ['HeartRate', 'SpO2', 'ValidHeartRate', 'ValidSpO2']
+        if not all(col in df_new_data.columns for col in expected_columns):
+            return jsonify({"error": f"Expected columns {expected_columns} but got {df_new_data.columns.tolist()}"})
+
+        # Check if DataFrame is not empty
+        if df_new_data.empty:
+            return jsonify({"error": "No data provided in request"})
+
+        # Predict anomalies
+        is_anomaly, reconstruction_error = predict_anomaly(autoencoder, scaler, threshold, df_new_data)
+
+        # Return the results as JSON
+        return jsonify({"reconstruction_error": reconstruction_error.tolist(), "is_anomaly": is_anomaly.tolist()})
+
+    except Exception as e:
+        # Log the error and return a 500 response with the error message
+        print(f"Error during prediction: {e}")
+        return jsonify({"error": str(e)}), 500
+
 
 
 # API route for generating insights

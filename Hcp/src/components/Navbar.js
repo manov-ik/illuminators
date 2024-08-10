@@ -14,20 +14,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const user = useSelector((store) => store.user);
 
-  const handleToggle = () => {
-    setToggle(!toggle);
-  };
 
-  const handleSignout = () => {
-    signOut(auth)
-      .then(() => {
-        dispatch(removeUser());
-        navigate("/");
-      })
-      .catch((error) => {
-        navigate("/error");
-      });
-  };
 
   // Active and normal navLink styles
   const activeLink = "border-b-2 border-red-500 text-red-500 px-4 py-2";

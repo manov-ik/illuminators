@@ -8,7 +8,7 @@ const data = [
   { name: '15 mins ago', oxygen: 92 },
   { name: '10 mins ago', oxygen: 94 },
   { name: '5 mins ago', oxygen: 95 },
-  { name: 'Now', oxygen: 96 },
+  { name: 'Now', oxygen: 89 },
 ];
 
 const OxygenLevelGraph = () => {

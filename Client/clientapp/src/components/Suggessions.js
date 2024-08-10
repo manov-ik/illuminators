@@ -8,7 +8,7 @@ const Hero = () => {
   return (
       <div className='wrapper md:px-20 lg:px-40'>
         <Navbar/>
-
+        <h2 className="text-white text-center text-4xl">Insights</h2>
       </div>
   );
 };

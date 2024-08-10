@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { db } from "../firebase";
 import { collection, addDoc, doc, setDoc } from "firebase/firestore";
+import Navbar from "./Navbar";
 
 const UserForm = () => {
   const [name, setName] = useState("");
@@ -42,7 +43,9 @@ const UserForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4">
+   <div className='wrapper md:px-20 lg:px-40'>
+    <Navbar/>
+     <form onSubmit={handleSubmit} className="p-4">
       <input
         type="text"
         placeholder="Name"
@@ -73,6 +76,7 @@ const UserForm = () => {
       />
       <button type="submit">Register User</button>
     </form>
+   </div>
   );
 };
 

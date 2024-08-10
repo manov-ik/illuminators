@@ -4,13 +4,13 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import OxygenLevelGraph from './Oxygengraph';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../utils/firebase'; // Import the Realtime Database instance
-import { ref, onValue, query, limitToLast } from "firebase/database"; // Import required functions
+import { db } from '../utils/firebase'; 
+import { ref, onValue, query, limitToLast } from "firebase/database"; 
 
 const Browse = () => {
   const [heartRate, setHeartRate] = useState(null);
   const [spo2, setSpo2] = useState(null);
-  const pulseRate = 82;  // Pulse rate (this can be replaced with dynamic data)
+  const pulseRate = 82;  // Pulse rate 
   const hrv = 56;        // Heart Rate Variability
   const tension = 44;    // Tension level
 
@@ -18,7 +18,7 @@ const Browse = () => {
   const ecgRef = useRef(null);
 
   useEffect(() => {
-    // Reference to your HealthData in the database
+    
     const healthDataRef = query(ref(db, 'HealthData'), limitToLast(1)); // Get the most recent entry
 
     // Fetch the data when it changes
@@ -101,37 +101,7 @@ const Browse = () => {
   return (
     <div className='wrapper md:px-20 lg:px-40'>
       <Navbar />
-      <div className='days-bar'>
-        <div className='day active'>
-          <div className='day-name'>Mon</div>
-          <div className='day-date'>02</div>
-        </div>
-        <div className='day'>
-          <div className='day-name'>Sun</div>
-          <div className='day-date'>01</div>
-        </div>
-        <div className='day'>
-          <div className='day-name'>Tue</div>
-          <div className='day-date'>03</div>
-        </div>
-        <div className='day'>
-          <div className='day-name'>Wed</div>
-          <div className='day-date'>04</div>
-        </div>
-        <div className='day'>
-          <div className='day-name'>Thu</div>
-          <div className='day-date'>05</div>
-        </div>
-        <div className='day'>
-          <div className='day-name'>Fri</div>
-          <div className='day-date'>06</div>
-        </div>
-        <div className='day'>
-          <div className='day-name'>Sat</div>
-          <div className='day-date'>07</div>
-        </div>
-      </div>
-
+     
       <div className="w-80 mx-auto Pulse p-4 rounded-xl text-white shadow-lg">
         <div className="pb-2">
           <h2 className="text-lg">Pulse Rate</h2>
@@ -154,7 +124,7 @@ const Browse = () => {
 
       <div className="content centered">
         <div className="progress-bar-container">
-          <OxygenLevelGraph spo2={spo2} /> {/* Pass SpO2 data to the OxygenLevelGraph component */}
+          <OxygenLevelGraph spo2={spo2} />
         </div>
       </div>
 

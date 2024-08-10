@@ -12,10 +12,10 @@ from keras.models import load_model
 
 
 def download_data():
-    path = "C:/Users/mano/Downloads/esp8266-hr-spo2-firebase-adminsdk-ko2r2-60e0be8017.json"
-    cred = credentials.Certificate(path)  # Replace with the path to your service account key
+    path = "path to service account key" # Replace with the path to your service account key (json file)
+    cred = credentials.Certificate(path)  
     firebase_admin.initialize_app(cred, {
-        'databaseURL': 'https://esp8266-hr-spo2-default-rtdb.asia-southeast1.firebasedatabase.app/'  # Replace with your database URL
+        'databaseURL': 'your database url'  # Replace with your database URL
     })
 
     # Reference to the specific path in Firebase

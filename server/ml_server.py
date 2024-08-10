@@ -9,6 +9,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 import pickle
 from keras.models import load_model
+import google.generativeai as genai
 
 
 def download_data():
@@ -111,6 +112,16 @@ def load_model_and_scaler(model_path, scaler_path, threshold_path):
     
     return autoencoder, scaler, threshold
 
+
+def generate_insights(spo2, heartrate):
+    GOOGLE_API_KEY = "your_api_key"
+    genai.configure(api_key=GOOGLE_API_KEY)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    req = "this is my spo2 level "+ str(spo2)+" and this is my heart rate " +str(heartrate) +" give me some insights like what food to eat , what to make it as normal if this is abnormal ? give responce in 30 to 50 words only "
+    print(req)
+    response = model.generate_content(str(req))
+    #print(response.text)
+    return response.text
 
 download_data()
 

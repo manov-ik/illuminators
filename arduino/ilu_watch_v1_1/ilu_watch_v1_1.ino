@@ -11,7 +11,6 @@
 #include <ESP8266WiFi.h>
 #endif
 
-
 /* Define WiFi credentials */
 #define WIFI_SSID "your_ssid"
 #define WIFI_PASSWORD "ssid_password"
@@ -22,7 +21,7 @@
 #define USER_PASSWORD "auth_email_password"
 #define DATABASE_URL "database_url"
 
-/* Initialize MAX30105 sensor */
+/* Initialize MAX30102 sensor */
 MAX30105 particleSensor;
 
 #define MAX_BRIGHTNESS 255
@@ -36,69 +35,109 @@ int8_t validSPO2; // indicator to show if the SPO2 calculation is valid
 int32_t heartRate; // heart rate value
 int8_t validHeartRate; // indicator to show if the heart rate calculation is valid
 
+FirebaseData fbdo;
+FirebaseAuth auth;
+FirebaseConfig config;
 
-const int pulseLED = D4; // Must be on a PWM-capable pin (GPIO 2)
-const int readLED = LED_BUILTIN; // Onboard LED (GPIO 16)
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", 19800, 60000); // Get time from NTP server
+
+unsigned long sendDataPrevMillis = 0;
 
 void setup() {
-  Serial.begin(115200); // Initialize serial communication at 115200 bits per second
+  Serial.begin(115200);
 
-  pinMode(pulseLED, OUTPUT);
-  pinMode(readLED, OUTPUT);
+  // Initialize WiFi
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(300);
+  }
+  Serial.println();
+  Serial.print("Connected with IP: ");
+  Serial.println(WiFi.localIP());
 
-  // Initialize sensor
-  if (!particleSensor.begin(Wire, I2C_SPEED_FAST)) // Use default I2C port, 400kHz speed
-  {
+  // Initialize Firebase
+  config.api_key = API_KEY;
+  auth.user.email = USER_EMAIL;
+  auth.user.password = USER_PASSWORD;
+  config.database_url = DATABASE_URL;
+  Firebase.reconnectNetwork(true);
+  fbdo.setBSSLBufferSize(4096, 1024);
+  fbdo.setResponseSize(2048);
+  Firebase.begin(&config, &auth);
+  Firebase.setDoubleDigits(5);
+
+  // Initialize NTP Client for time
+  timeClient.begin();
+
+  // Initialize MAX30105 sensor
+  if (!particleSensor.begin(Wire, I2C_SPEED_FAST)) {
     Serial.println(F("MAX30105 was not found. Please check wiring/power."));
     while (1);
   }
 
-  byte ledBrightness = 60; // Options: 0=Off to 255=50mA
-  byte sampleAverage = 1; // Set sample average to 1 to avoid averaging
-  byte ledMode = 2; // Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
-  byte sampleRate = 100; // Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
-  int pulseWidth = 411; // Options: 69, 118, 215, 411
-  int adcRange = 4096; // Options: 2048, 4096, 8192, 16384
-
-  particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange); // Configure sensor with these settings
+  byte ledBrightness = 60;
+  byte sampleAverage = 1;
+  byte ledMode = 2;
+  byte sampleRate = 100;
+  int pulseWidth = 411;
+  int adcRange = 4096;
+  particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange);
 }
 
 void loop() {
-  bufferLength = 100; // buffer length of 100 stores 4 seconds of samples running at 25sps
-
-  // read 100 samples and display raw data and calculated values
+  bufferLength = 100;
   for (byte i = 0; i < bufferLength; i++) {
-    while (particleSensor.available() == false) // wait for new data
-      particleSensor.check(); // Check the sensor for new data
+    while (particleSensor.available() == false)
+      particleSensor.check();
 
     redBuffer[i] = particleSensor.getRed();
     irBuffer[i] = particleSensor.getIR();
-    particleSensor.nextSample(); // We're finished with this sample, so move to the next sample
-
-    // Display raw data
-    Serial.print(F("red="));
-    Serial.print(redBuffer[i], DEC);
-    Serial.print(F(", ir="));
-    Serial.println(irBuffer[i], DEC);
+    particleSensor.nextSample();
   }
 
-  // calculate heart rate and SpO2 after reading 100 samples
   maxim_heart_rate_and_oxygen_saturation(irBuffer, bufferLength, redBuffer, &spo2, &validSPO2, &heartRate, &validHeartRate);
 
-  // Display calculated values
-  Serial.print(F("HR="));
-  Serial.print(heartRate, DEC);
+  // Get the current time from NTP server
+  timeClient.update();
+  String formattedTime = timeClient.getFormattedTime();
+  
+  // Use formatted time as a unique path in Firebase
+  String path = "/HealthData/" + formattedTime;
 
-  Serial.print(F(", HRvalid="));
-  Serial.print(validHeartRate, DEC);
+  if (Firebase.ready() && (millis() - sendDataPrevMillis > 10000 || sendDataPrevMillis == 0)) {
+    sendDataPrevMillis = millis();
 
-  Serial.print(F(", SPO2="));
-  Serial.print(spo2, DEC);
+    if (Firebase.RTDB.setInt(&fbdo, path + "/HeartRate", heartRate)) {
+      Serial.print("Heart Rate stored at: ");
+      Serial.println(path + "/HeartRate");
+    } else {
+      Serial.println("FAILED to store Heart Rate: " + fbdo.errorReason());
+    }
 
-  Serial.print(F(", SPO2Valid="));
-  Serial.println(validSPO2, DEC);
+    if (Firebase.RTDB.setInt(&fbdo, path + "/ValidHeartRate", validHeartRate)) {
+      Serial.print("Valid Heart Rate stored at: ");
+      Serial.println(path + "/ValidHeartRate");
+    } else {
+      Serial.println("FAILED to store Valid Heart Rate: " + fbdo.errorReason());
+    }
 
-  // Wait for 3 seconds before the next measurement
-  delay(3000);  // 3 seconds delay
+    if (Firebase.RTDB.setInt(&fbdo, path + "/SpO2", spo2)) {
+      Serial.print("SpO2 stored at: ");
+      Serial.println(path + "/SpO2");
+    } else {
+      Serial.println("FAILED to store SpO2: " + fbdo.errorReason());
+    }
+
+    if (Firebase.RTDB.setInt(&fbdo, path + "/ValidSpO2", validSPO2)) {
+      Serial.print("Valid SpO2 stored at: ");
+      Serial.println(path + "/ValidSpO2");
+    } else {
+      Serial.println("FAILED to store Valid SpO2: " + fbdo.errorReason());
+    }
+  }
+
+  delay(10000);  // Delay for the next measurement
 }
-

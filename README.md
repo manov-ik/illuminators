@@ -1,6 +1,6 @@
-## Smart Wearable Device - Pulse Pro
+# Smart Wearable Device - Pulse Pro
 
-# ILLUMINATORS
+### ILLUMINATORS
 
 Smart Wearable Devices is an IoT project for health monitoring. It features a hardware device that measures SpO2, temperature, and heart rate, with data displayed and analyzed in the Pulse Pro app, offering users insights and personalized health recommendations.
 

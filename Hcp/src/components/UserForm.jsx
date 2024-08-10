@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { db } from "../firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, doc, setDoc } from "firebase/firestore";
 
 const UserForm = () => {
   const [name, setName] = useState("");
@@ -11,17 +11,31 @@ const UserForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addDoc(collection(db, "users"), {
+      const userDocRef = await addDoc(collection(db, "users"), {
         name: name,
         age: age,
         height: height,
         weight: weight,
       });
+
+      // Create health data for the new user. Fetch from esp/flask server.
+      const defaultHealthData = {
+        heartRate: 120,
+        SPO2: 80,
+        healthStatus: "normal",
+        insights: "no recommendations",
+      };
+
+      await setDoc(
+        doc(db, "users", userDocRef.id, "healthData", "default"),
+        defaultHealthData
+      );
+
       setName("");
       setAge("");
       setHeight("");
       setWeight("");
-      console.log("User registered successfully!")
+      console.log("User registered and health data initialized successfully!");
     } catch (e) {
       console.error("Error adding document: ", e);
     }

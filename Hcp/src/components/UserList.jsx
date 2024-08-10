@@ -4,7 +4,7 @@ import { collection, getDoc, getDocs, doc } from "firebase/firestore";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectUSer] = useState(null);
+  const [selectedUser, setSelectUser] = useState(null);
   const [healthData, setHealthData] = useState([]);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const UserList = () => {
     const userRef = doc(db, "users", userId);
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
-      setSelectUSer(userSnap.data());
+      setSelectUser(userSnap.data());
     }
 
     const healthDataCollection = collection(db, "users", userId, "healthData");

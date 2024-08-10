@@ -2,13 +2,14 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import {getAuth} from "firebase/auth"
+import { getDatabase } from "firebase/database"; 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBvsqDKZkeusySWw91SzmSRvXHBhnJR35Y",
+  apiKey: process.env.FIREBASE_API_KEY,
   authDomain: "esp8266-hr-spo2.firebaseapp.com",
   databaseURL: "https://esp8266-hr-spo2-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "esp8266-hr-spo2",
@@ -22,3 +23,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 export const auth = getAuth();
+export const db = getDatabase(app);
+
+

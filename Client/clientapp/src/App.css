@@ -1,38 +1,123 @@
-.App {
+.wrapper {
+  background: linear-gradient(rgba(0, 0, 0, .8), rgba(0, 0, 0, .7)), url('./asserts/joe-gadd-E3KIeEtnyEk-unsplash.jpg');
+  height: 100vh;
+  width: 100%;
+  margin: 0;
+  background-attachment: fixed;
+  position: relative;
+  background-position: center;
+  background-size: cover;
+  overflow-y: auto; 
+}
+button {
+  padding: 7px 14px;
+  font-size: 1.2rem;
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  border: 1px solid rgb(249, 168, 168);
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+button:hover { 
+  background: white;
+  color: black;
+}
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 20px;
+}
+.Pulse{
+  background-color: #1d1b1b;
+  padding: 20px;
+  width: 100%;
+  max-width: 380px;
+  
+}
+.content {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.progress-bar-container {
+  background-color: #1d1b1b;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 15px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.progress-bar {
+  width: 40%;
+  position: relative;
+  justify-content: center;
+  align-items: center;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.day {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  padding: 10px;
+  cursor: pointer;
   color: white;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  border-radius: 10px;
 }
 
-.App-link {
-  color: #61dafb;
+.day:hover {
+  background-color: #444;
+  transform: translateY(-3px);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.day-name {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.day-date {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.day.active {
+  background-color: #555;
+  border-radius: 10px;
+  transform: scale(1.1);
+}
+
+.days-bar {
+  display: flex;
+  justify-content: space-around;
+  padding: 15px 10px;
+  background-color: #1d1b1b;
+  margin-bottom: 30px;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+button.know-more-button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  color: #fff;
+  font-weight: 600;
+  background-color: #f44444; /* Green color */
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button.know-more-button:hover {
+  background-color: #ff0314; /* Darker green on hover */
+  transform: scale(1.05);
 }

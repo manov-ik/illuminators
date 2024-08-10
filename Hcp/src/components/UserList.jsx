@@ -56,8 +56,13 @@ const UserList = () => {
           <ul>
             {healthData.map((data) => (
               <li key={data.id}>
-                {data.date.toDate().toString()} - HR: {data.heartRate} - SpO2:{" "}
-                {data.oxygenSaturation}
+                HR: {data.heartRate}
+                <br />
+                SpO2: {data.SPO2}
+                <br/>
+                Health Status: {data.healthStatus}
+                <br />
+                Insights: {data.insights}
               </li>
             ))}
           </ul>

@@ -39,6 +39,10 @@ Provide clients with diet and exercise recommendations to support their health g
 
 
 ### Hardware Specifications
+
+#### Data Enhancement
+The autoencoder model is designed for anomaly detection by learning a compact representation of input data. It consists of an input layer, an encoder that compresses data with ReLU activation, and a decoder that reconstructs it using sigmoid activation. Trained with Mean Squared Error and the Adam optimizer, the model minimizes reconstruction errors. A threshold set at the 95th percentile of these errors flags data points above it as anomalies, making the autoencoder effective for identifying deviations from normal patterns.
+
 ##### SpO2 Sensor: 
 Measures blood oxygen levels.
 ##### Temperature Sensor: 

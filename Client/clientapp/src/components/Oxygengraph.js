@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 
 const OxygenLevelGraph = ({ data }) => {
   return (
-    <div>
+    <div className='w-100%'>
       <h2 className='text-white text-center'>Oxygen Levels</h2>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>

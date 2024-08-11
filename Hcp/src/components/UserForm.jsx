@@ -50,7 +50,7 @@ const UserForm = () => {
       <div >
         <form 
           onSubmit={handleSubmit}
-          className='shadow-2xl border border-gray-400 bg-gray-100 rounded-lg p-9 m-5 md:w-4/12 md:my-36 sm:my-28 sm:mx-auto md:p-12'>
+          className='shadow-2xl border border-gray-400 bg-gray-100 rounded-lg p-9 m-5 md:w-4/12 md:my-36 sm:my-28 sm:mx-auto md:p-12  b-0'>
           <h1 className="font-semibold text-2xl m-4">Register User</h1>
 
           <input

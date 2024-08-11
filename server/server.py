@@ -138,7 +138,7 @@ def generate_insights(spo2, heartrate):
     GOOGLE_API_KEY = "AIzaSyCKC_MF8UvUKjXVg1eFeuUlsXf6d4OKCH0"
     genai.configure(api_key=GOOGLE_API_KEY)
     model = genai.GenerativeModel("gemini-1.5-flash")
-    req = "this is my spo2 level " + str(spo2) + " and this is my heart rate " + str(heartrate) + " give me some insights like what food to eat, what to make it as normal if this is abnormal? give response in 30 to 50 words only"
+    req = "this is my spo2 level " + str(spo2) + " and this is my heart rate " + str(heartrate) + " give me some insights like what food to eat, what to make it as normal if this is abnormal? give response in 50 to 70 words and give me as points with line breaks"
     response = model.generate_content(str(req))
     return response.text
 

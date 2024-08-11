@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser } from '../utils/UserSlice';
-import { USER_URL } from "../utils/constants"; // Assuming USER_URL is a constant containing the default profile picture URL
+import { USER_URL } from "../utils/constants";
 
 const Login = () => {
   const [isSignInform, setisSignInform] = useState(false);
@@ -72,42 +72,46 @@ const Login = () => {
   };
 
   return (
-    <div className='wrapper md:px-20 lg:px-40'>
+    <div className="wrapper min-h-screen bg-gray-900">
       <Navbar />
-      <div>
+      <div className="flex flex-col justify-center items-center h-full p-4">
         {!user ? (
           <form 
             onSubmit={(e) => e.preventDefault()}
-            className='shadow-2xl bg-white rounded-lg sm:p-7 sm:m-4 md:w-4/12 md:my-36 sm:my-28 sm:mx-auto right-0 left-0 md:p-12'>
-            <h1 className="font-semibold text-2xl m-4">{isSignInform ? "Log In" : "Sign Up"}</h1>
-            {!isSignInform && 
+            className="shadow-lg bg-white rounded-lg w-full max-w-md p-6 sm:p-7 md:p-8 lg:p-10">
+            <h1 className="font-semibold text-xl sm:text-2xl text-center mb-6">{isSignInform ? "Log In" : "Sign Up"}</h1>
+            {!isSignInform && (
               <input 
                 ref={nameref}
-                type='text'
+                type="text"
                 placeholder="Full Name"
-                className='p-3 m-4 border border-gray-400 w-full rounded-lg'/>
-            }
+                className="p-3 mb-4 border border-gray-300 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            )}
             <input 
               ref={emailref}
-              type='text'
+              type="text"
               placeholder="Email Address"
-              className='p-3 m-4 border border-gray-400 w-full rounded-lg'/>
+              className="p-3 mb-4 border border-gray-300 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
             <input
               ref={passwordref}
-              type='password' 
+              type="password" 
               placeholder="Password" 
-              className='p-3 m-4 border border-gray-400 w-full rounded-lg'/>
-            <p className='text-red-500 font-semibold m-4'>{errormessage}</p>
-            <button className='w-full bg-red-500 p-3 m-4 rounded-lg' onClick={handleButtonclick}>
+              className="p-3 mb-4 border border-gray-300 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <p className="text-red-500 font-semibold mb-4">{errormessage}</p>
+            <button 
+              className="w-full bg-red-500 text-white p-3 mb-4 rounded-lg hover:bg-red-600 transition duration-200"
+              onClick={handleButtonclick}>
               {isSignInform ? "Log In" : "Sign Up"}
             </button>
-            <p className='p-3'>Forgot password?</p>
-            <p className='p-3 cursor-pointer' onClick={toggleSignin}>
-              {isSignInform ? "New to career? Sign Up" : "Already registered? Log In"}
+            <p className="text-center text-gray-600 cursor-pointer hover:underline" onClick={toggleSignin}>
+              {isSignInform ? "New to PulsePro? Sign Up" : "Already registered? Log In"}
             </p>
           </form>
         ) : (
-          <div className='text-center mt-20'>
+          <div className="text-center text-white">
             <p>You are logged in!</p>
           </div>
         )}

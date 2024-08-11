@@ -9,37 +9,34 @@ import { ref, onValue, query, limitToLast } from "firebase/database";
 const Browse = () => {
   const [heartRate, setHeartRate] = useState(null);
   const [spo2, setSpo2] = useState(null);
-  
+  const [oxygenData, setOxygenData] = useState([]);
+
   // Refs for the ECG animation
   const ecgRef = useRef(null);
 
   const navigate = useNavigate();
 
-  // Threshold values
-  const heartRateThreshold = 60;
-  const spo2Threshold = 90;
+  
 
   useEffect(() => {
-    const healthDataRef = query(ref(db, 'HealthData'), limitToLast(1)); // Get the most recent entry
+    const healthDataRef = query(ref(db, 'HealthData'), limitToLast(7)); // Get the last 7 entries for graph
 
-    // Fetch the data when it changes
     onValue(healthDataRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        const latestEntry = Object.values(data)[0]; // Get the most recent data entry
+        const entries = Object.values(data);
+        const oxygenLevels = entries.map((entry, index) => ({
+          name: index === entries.length - 1 ? 'Now' : `${(entries.length - index - 1) * 5} mins ago`,
+          oxygen: entry.SpO2 || 0,
+        }));
+
+        const latestEntry = entries[entries.length - 1]; // Get the most recent data entry
         const newHeartRate = latestEntry.HeartRate || 0;
         const newSpo2 = latestEntry.SpO2 || 0;
 
         setHeartRate(newHeartRate);
         setSpo2(newSpo2);
-
-        // Check if the values are below the threshold and trigger an alert
-        if (newHeartRate < heartRateThreshold) {
-          alert(`Warning: Heart Rate is below ${heartRateThreshold} bpm!`);
-        }
-        if (newSpo2 < spo2Threshold) {
-          alert(`Warning: SpO2 level is below ${spo2Threshold}%!`);
-        }
+        setOxygenData(oxygenLevels);
       }
     });
 
@@ -128,8 +125,8 @@ const Browse = () => {
       </div>
 
       <div className="content centered">
-        <div className="progress-bar-container">
-          <OxygenLevelGraph spo2={spo2} />
+        <div className="progress-bar-container w-44">
+          <OxygenLevelGraph data={oxygenData} />
         </div>
       </div>
 

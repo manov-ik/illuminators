@@ -1,6 +1,7 @@
 # Smart Wearable Device - Pulse Pro
 
-### ILLUMINATORS
+  ![Frame 1](https://github.com/user-attachments/assets/2e29b639-02fd-415e-becb-bd4cdc6bcb5c)
+
 
 Pulse Pro is an IoT project for health monitoring. It features a hardware device that measures SpO2, temperature, and heart rate, with data displayed and analyzed in the Pulse Pro app, offering users insights and personalized health recommendations.
 

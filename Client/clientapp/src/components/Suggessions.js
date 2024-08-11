@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 
 const Hero = () => {
-  const navigate = useNavigate();
+  
   const [insights, setInsights] = useState("");
   const [error, setError] = useState(null);
 
@@ -15,7 +14,7 @@ const Hero = () => {
     // Define the function to fetch insights
     const fetchInsights = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:5000//insights', {
+        const response = await fetch('http://127.0.0.1:5000/insights', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

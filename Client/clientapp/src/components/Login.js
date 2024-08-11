@@ -1,14 +1,14 @@
 import React, { useRef, useState } from 'react';
 import { CheckValidData } from '../utils/Validate';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from '../utils/firebase';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import { useDispatch, useSelector } from 'react-redux';
-import { addUser, removeUser } from '../utils/UserSlice';
+import { addUser } from '../utils/UserSlice';
+import { USER_URL } from "../utils/constants"; // Assuming USER_URL is a constant containing the default profile picture URL
 
 const Login = () => {
-  // Initialize isSignInform to false so that the sign-up page displays first
   const [isSignInform, setisSignInform] = useState(false);
   const [errormessage, seterrormesssage] = useState(null);
   const navigate = useNavigate();
@@ -30,9 +30,10 @@ const Login = () => {
           const user = userCredential.user;
           updateProfile(user, {
             displayName: nameref.current.value,
+            photoURL: USER_URL,
           }).then(() => {
-            const { uid, email, displayName } = auth.currentUser;
-            dispatch(addUser({ uid, email, displayName }));
+            const { uid, email, displayName, photoURL } = auth.currentUser;
+            dispatch(addUser({ uid, email, displayName, photoURL }));
             navigate("/browse");
           }).catch((error) => {
             seterrormesssage(error.message);
@@ -47,9 +48,16 @@ const Login = () => {
       signInWithEmailAndPassword(auth, emailref.current.value, passwordref.current.value)
         .then((userCredential) => {
           const user = userCredential.user;
-          const { uid, email, displayName } = user;
-          dispatch(addUser({ uid, email, displayName }));
-          navigate("/browse");
+          updateProfile(auth.currentUser, {
+            displayName: nameref.current ? nameref.current.value : auth.currentUser.displayName,
+            photoURL: USER_URL,
+          }).then(() => {
+            const { uid, email, displayName, photoURL } = auth.currentUser;
+            dispatch(addUser({ uid, email, displayName, photoURL }));
+            navigate("/browse");
+          }).catch((error) => {
+            seterrormesssage(error.message);
+          });
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -57,15 +65,6 @@ const Login = () => {
           seterrormesssage(errorCode + "-" + errorMessage);
         });
     }
-  };
-
-  const handleSignout = () => {
-    signOut(auth).then(() => {
-      dispatch(removeUser());
-      navigate("/");
-    }).catch((error) => {
-      navigate("/error");
-    });
   };
 
   const toggleSignin = () => {
@@ -88,12 +87,6 @@ const Login = () => {
                 placeholder="Full Name"
                 className='p-3 m-4 border border-gray-400 w-full rounded-lg'/>
             }
-            {!isSignInform &&  
-              <input
-                type='text'
-                placeholder="Age"
-                className='p-3 m-4 border border-gray-400 w-full rounded-lg'/>
-            }
             <input 
               ref={emailref}
               type='text'
@@ -101,7 +94,7 @@ const Login = () => {
               className='p-3 m-4 border border-gray-400 w-full rounded-lg'/>
             <input
               ref={passwordref}
-              type='passwordref' 
+              type='password' 
               placeholder="Password" 
               className='p-3 m-4 border border-gray-400 w-full rounded-lg'/>
             <p className='text-red-500 font-semibold m-4'>{errormessage}</p>
@@ -115,9 +108,7 @@ const Login = () => {
           </form>
         ) : (
           <div className='text-center mt-20'>
-            <button className='w-full bg-red-500 p-3 m-4 rounded-lg' onClick={handleSignout}>
-              Sign Out
-            </button>
+            <p>You are logged in!</p>
           </div>
         )}
       </div>

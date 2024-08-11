@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Navbar from "./Navbar";
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import OxygenLevelGraph from './Oxygengraph';
 import { useNavigate } from 'react-router-dom';
@@ -10,15 +9,17 @@ import { ref, onValue, query, limitToLast } from "firebase/database";
 const Browse = () => {
   const [heartRate, setHeartRate] = useState(null);
   const [spo2, setSpo2] = useState(null);
-  const pulseRate = 82;  // Pulse rate 
-  const hrv = 56;        // Heart Rate Variability
-  const tension = 44;    // Tension level
-
+  
   // Refs for the ECG animation
   const ecgRef = useRef(null);
 
+  const navigate = useNavigate();
+
+  // Threshold values
+  const heartRateThreshold = 60;
+  const spo2Threshold = 90;
+
   useEffect(() => {
-    
     const healthDataRef = query(ref(db, 'HealthData'), limitToLast(1)); // Get the most recent entry
 
     // Fetch the data when it changes
@@ -26,8 +27,19 @@ const Browse = () => {
       const data = snapshot.val();
       if (data) {
         const latestEntry = Object.values(data)[0]; // Get the most recent data entry
-        setHeartRate(latestEntry.HeartRate || 0);
-        setSpo2(latestEntry.SpO2 || 0);
+        const newHeartRate = latestEntry.HeartRate || 0;
+        const newSpo2 = latestEntry.SpO2 || 0;
+
+        setHeartRate(newHeartRate);
+        setSpo2(newSpo2);
+
+        // Check if the values are below the threshold and trigger an alert
+        if (newHeartRate < heartRateThreshold) {
+          alert(`Warning: Heart Rate is below ${heartRateThreshold} bpm!`);
+        }
+        if (newSpo2 < spo2Threshold) {
+          alert(`Warning: SpO2 level is below ${spo2Threshold}%!`);
+        }
       }
     });
 
@@ -96,8 +108,6 @@ const Browse = () => {
     drawECG();
   }, []);
 
-  const navigate = useNavigate();
-
   return (
     <div className='wrapper md:px-20 lg:px-40'>
       <Navbar />
@@ -115,34 +125,11 @@ const Browse = () => {
         <div className="mt-4">
           <canvas ref={ecgRef} width="300" height="70" className="w-full rounded-md shadow-inner"></canvas>
         </div>
-
-        <div className="flex justify-between mt-2 text-sm">
-          <span>HRV <strong>{hrv}</strong></span>
-          <span>Tension <strong>{tension}%</strong></span>
-        </div>
       </div>
 
       <div className="content centered">
         <div className="progress-bar-container">
           <OxygenLevelGraph spo2={spo2} />
-        </div>
-      </div>
-
-      <div className="content centered">
-        <div className='progress-bar-container'>
-          <div className='progress-bar'>
-            <h2 className='text-white pb-4'>Temperature</h2>
-            <CircularProgressbar 
-              value={pulseRate} 
-              text={`${pulseRate}%`}
-              styles={buildStyles({
-                textColor: 'white',
-                pathColor: 'url(#redYellowGreenGradient)',
-                trailColor: '#333',
-                textSize: '20px',
-              })} 
-            />
-          </div>
         </div>
       </div>
 

@@ -15,10 +15,12 @@ import schedule
 import time
 from datetime import datetime
 from tensorflow.keras.losses import MeanSquaredError
+from flask_cors import CORS
+
 
 
 app = Flask(__name__)
-
+CORS(app)
 def initialize_firebase():
     path = "./credentials.json"  # Replace with the path to your service account key (json file)
     cred = credentials.Certificate(path)
